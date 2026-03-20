@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flipkart – Recommended For You</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --fk-blue: #2874f0;
+      --fk-yellow: #ff9f00;
+      --fk-green: #388e3c;
+      --fk-red: #ff4848;
+      --fk-bg: #f1f3f6;
+      --fk-white: #ffffff;
+      --fk-text: #212121;
+      --fk-gray: #878787;
+      --fk-border: #e0e0e0;
+      --card-w: 200px;
+      --card-radius: 4px;
+    }
+
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background: var(--fk-bg);
+      min-height: 100vh;
+      padding: 24px 0 40px;
+    }
+
+    /* ── Header Bar ── */
+    .fk-header {
+      background: var(--fk-blue);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .fk-logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      font-style: italic;
+      letter-spacing: -0.5px;
+    }
+    .fk-logo span { color: var(--fk-yellow); }
+
+    /* ── Section ── */
+    .section-wrap {
+      max-width: 1200px;
+      margin: 0 auto 16px;
+      padding: 0 12px;
+    }
+
+    .section-card {
+      background: var(--fk-white);
+      border-radius: var(--card-radius);
+      padding: 16px 0 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+      overflow: hidden;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px 12px;
+      border-bottom: 1px solid var(--fk-border);
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--fk-text);
+    }
+    .view-all-btn {
+      background: var(--fk-blue);
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 2px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: .3px;
+      transition: background .15s;
+    }
+    .view-all-btn:hover { background: #1a65d6; }
+
+    /* ── Carousel ── */
+    .carousel-wrap {
+      position: relative;
+    }
+    .carousel-track {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      padding: 16px 0 8px;
+    }
+    .carousel-track::-webkit-scrollbar { display: none; }
+
+    /* Arrow buttons */
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 72px;
+      background: var(--fk-white);
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: box-shadow .15s;
+    }
+    .arrow:hover { box-shadow: 0 4px 14px rgba(0,0,0,.22); }
+    .arrow.left  { left: 0;  border-radius: 0 4px 4px 0; }
+    .arrow.right { right: 0; border-radius: 4px 0 0 4px; }
+    .arrow svg   { width: 18px; height: 18px; stroke: var(--fk-blue); stroke-width: 2.5; fill: none; }
+
+    /* ── Product Card ── */
+    .product-card {
+      min-width: var(--card-w);
+      max-width: var(--card-w);
+      padding: 12px 10px 14px;
+      cursor: pointer;
+      border-right: 1px solid var(--fk-border);
+      transition: box-shadow .15s;
+      position: relative;
+      background: var(--fk-white);
+    }
+    .product-card:last-child { border-right: none; }
+    .product-card:hover { box-shadow: inset 0 -3px 0 var(--fk-blue); }
+    .product-card:hover .add-to-cart { opacity: 1; transform: translateY(0); }
+
+    .img-wrap {
+      width: 100%;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: transform .25s ease;
+    }
+    .product-card:hover .img-wrap img { transform: scale(1.06); }
+
+    .product-name {
+      font-size: 13px;
+      color: var(--fk-text);
+      font-weight: 500;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 6px;
+      height: 36px;
+    }
+
+    .rating-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .rating-badge {
+      background: var(--fk-green);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .rating-badge svg { width: 10px; height: 10px; fill: #fff; }
+    .rating-count { font-size: 11px; color: var(--fk-gray); }
+
+    .price-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; margin-bottom: 3px; }
+    .price     { font-size: 15px; font-weight: 700; color: var(--fk-text); }
+    .mrp       { font-size: 12px; color: var(--fk-gray); text-decoration: line-through; }
+    .discount  { font-size: 12px; color: var(--fk-green); font-weight: 600; }
+
+    .offer-tag {
+      font-size: 11px;
+      color: var(--fk-blue);
+      font-weight: 500;
+    }
+
+    /* Add to Cart overlay */
+    .add-to-cart {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: var(--fk-blue);
+      color: #fff;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 0;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .2s, transform .2s;
+      letter-spacing: .3px;
+    }
+
+    /* Wishlist */
+    .wishlist-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      opacity: 0;
+      transition: opacity .15s;
+    }
+    .product-card:hover .wishlist-btn { opacity: 1; }
+    .wishlist-btn svg { width: 18px; height: 18px; stroke: var(--fk-gray); fill: none; stroke-width: 1.8; transition: stroke .15s, fill .15s; }
+    .wishlist-btn.active svg, .wishlist-btn:hover svg { stroke: var(--fk-red); fill: #ffe5e5; }
+
+    /* ── Tabs Row ── */
+    .tabs-row {
+      display: flex;
+      gap: 0;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--fk-border);
+      margin-bottom: 0;
+    }
+    .tab {
+      padding: 12px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--fk-gray);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: color .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .tab.active { color: var(--fk-blue); border-bottom-color: var(--fk-blue); }
+    .tab:hover  { color: var(--fk-blue); }
+
+    /* Category chips */
+    .chips-row {
+      display: flex;
+      gap: 8px;
+      padding: 10px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .chips-row::-webkit-scrollbar { display: none; }
+    .chip {
+      padding: 5px 14px;
+      border: 1px solid var(--fk-border);
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--fk-text);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: border-color .15s, color .15s, background .15s;
+      background: #fff;
+    }
+    .chip.active, .chip:hover {
+      border-color: var(--fk-blue);
+      color: var(--fk-blue);
+      background: #e8f0fe;
+    }
+
+    /* ── Responsive ── */
+    @media(max-width: 600px) {
+      :root { --card-w: 158px; }
+      .section-title { font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Fake Flipkart Header -->
+<div class="fk-header">
+  <div class="fk-logo">Flip<span>kart</span></div>
+</div>
+
+<div class="section-wrap">
+  <div class="section-card">
+
+    <!-- Section Header -->
+    <div class="section-header">
+      <span class="section-title">Recommended For You</span>
+      <button class="view-all-btn">VIEW ALL</button>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="tabs-row" id="tabs">
+      <div class="tab active" data-tab="all">All</div>
+      <div class="tab" data-tab="electronics">Electronics</div>
+      <div class="tab" data-tab="fashion">Fashion</div>
+      <div class="tab" data-tab="home">Home & Furniture</div>
+      <div class="tab" data-tab="beauty">Beauty</div>
+    </div>
+
+    <!-- Category Chips -->
+    <div class="chips-row" id="chips">
+      <div class="chip active">All</div>
+      <div class="chip">Smartphones</div>
+      <div class="chip">Laptops</div>
+      <div class="chip">Earphones</div>
+      <div class="chip">Watches</div>
+      <div class="chip">Shirts</div>
+      <div class="chip">Shoes</div>
+      <div class="chip">Skincare</div>
+    </div>
+
+    <!-- Carousel -->
+    <div class="carousel-wrap">
+      <button class="arrow left"  id="prev" onclick="scroll(-1)">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="arrow right" id="next" onclick="scroll(1)">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
+      <div class="carousel-track" id="track">
+        <!-- Cards injected by JS -->
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Second Section – Top Picks -->
+<div class="section-wrap">
+  <div class="section-card">
+    <div class="section-header">
+      <span class="section-title">Top Picks in Electronics</span>
+      <button class="view-all-btn">VIEW ALL</button>
+    </div>
+    <div class="carousel-wrap">
+      <button class="arrow left"  onclick="scroll2(-1)">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="arrow right" onclick="scroll2(1)">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="carousel-track" id="track2"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const products = [
+    { name: "boAt Airdopes 141 TWS Earbuds Bluetooth Headset", img: "https://m.media-amazon.com/images/I/51Y8BZMM5yL._AC_UL320_.jpg", price: 1299, mrp: 4990, rating: 4.1, reviews: "2,34,567", offer: "5% off with Axis Bank", category:"electronics" },
+    { name: "Redmi Note 13 Pro 5G (Midnight Black, 8GB RAM, 256GB Storage)", img: "https://m.media-amazon.com/images/I/41H3jUzE2cL._AC_UL320_.jpg", price: 24999, mrp: 28999, rating: 4.3, reviews: "89,234", offer: "10% Bank Offer", category:"electronics" },
+    { name: "Nike Air Max 270 Running Shoes For Men", img: "https://m.media-amazon.com/images/I/61CiZou1hiL._AC_UL320_.jpg", price: 8995, mrp: 12995, rating: 4.4, reviews: "12,450", offer: "Extra 5% off", category:"fashion" },
+    { name: "ASUS VivoBook 15 Intel Core i5 12th Gen Laptop 16GB RAM 512GB SSD", img: "https://m.media-amazon.com/images/I/51KWLm5G+RL._AC_UL320_.jpg", price: 52990, mrp: 64990, rating: 4.2, reviews: "9,876", offer: "EMI from ₹2,621", category:"electronics" },
+    { name: "Fossil Gen 6 Smartwatch 44mm Full Touch Screen Bluetooth", img: "https://m.media-amazon.com/images/I/61DWBn3h7BL._AC_UL320_.jpg", price: 14995, mrp: 24995, rating: 4.0, reviews: "3,210", offer: "No Cost EMI", category:"electronics" },
+    { name: "ZARA Regular Fit Linen Blend Blazer", img: "https://m.media-amazon.com/images/I/51VjEOI1mJL._AC_UL320_.jpg", price: 3999, mrp: 6999, rating: 4.2, reviews: "5,670", offer: "Buy 2 Get 10% off", category:"fashion" },
+    { name: "Samsung 55 inch 4K Ultra HD Smart LED TV UA55AUE60AK", img: "https://m.media-amazon.com/images/I/91MSp0P+2nL._AC_UL320_.jpg", price: 42990, mrp: 68900, rating: 4.3, reviews: "28,900", offer: "Flat ₹5000 Off", category:"electronics" },
+    { name: "Prestige Iris 750-Watt Mixer Grinder with 3 Stainless Steel Jars", img: "https://m.media-amazon.com/images/I/61wkQ5BKYSL._AC_UL320_.jpg", price: 2799, mrp: 5495, rating: 4.3, reviews: "41,234", offer: "Bank offer available", category:"home" },
+    { name: "Lakme Absolute Skin Natural Mousse Foundation SPF 8", img: "https://m.media-amazon.com/images/I/61-3kMgbMqL._AC_UL320_.jpg", price: 499, mrp: 799, rating: 4.1, reviews: "7,890", offer: "Buy 2 get 20% off", category:"beauty" },
+    { name: "Apple AirPods Pro 2nd Generation with MagSafe Case USB-C", img: "https://m.media-amazon.com/images/I/61SUj2aKoEL._AC_UL320_.jpg", price: 22900, mrp: 26900, rating: 4.6, reviews: "56,780", offer: "10% HDFC offer", category:"electronics" },
+    { name: "Puma Men's Tracksuit Comfort Fleece Jogger Set", img: "https://m.media-amazon.com/images/I/71GR+y+d+BL._AC_UL320_.jpg", price: 1899, mrp: 3999, rating: 4.0, reviews: "11,234", offer: "Buy 2 get 15% off", category:"fashion" },
+    { name: "Dyson V12 Detect Slim Cordless Vacuum Cleaner", img: "https://m.media-amazon.com/images/I/51pTI0BtqtL._AC_UL320_.jpg", price: 42900, mrp: 52900, rating: 4.5, reviews: "4,321", offer: "EMI from ₹2,138", category:"home" },
+  ];
+
+  const electronics = products.filter(p => p.category === "electronics");
+
+  function discount(p, mrp) { return Math.round((1 - p/mrp)*100); }
+
+  function cardHTML(p) {
+    return `
+      <div class="product-card" onclick="addToCart(this)">
+        <button class="wishlist-btn" onclick="toggleWish(event, this)" title="Wishlist">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <div class="img-wrap">
+          <img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/180x180?text=Product'"/>
+        </div>
+        <div class="product-name">${p.name}</div>
+        <div class="rating-row">
+          <span class="rating-badge">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            ${p.rating}
+          </span>
+          <span class="rating-count">(${p.reviews})</span>
+        </div>
+        <div class="price-row">
+          <span class="price">₹${p.price.toLocaleString('en-IN')}</span>
+          <span class="mrp">₹${p.mrp.toLocaleString('en-IN')}</span>
+          <span class="discount">${discount(p.price, p.mrp)}% off</span>
+        </div>
+        <div class="offer-tag">🏷 ${p.offer}</div>
+        <div class="add-to-cart">ADD TO CART</div>
+      </div>`;
+  }
+
+  function renderTrack(id, data) {
+    document.getElementById(id).innerHTML = data.map(cardHTML).join('');
+  }
+
+  renderTrack('track',  products);
+  renderTrack('track2', electronics);
+
+  // Scroll handlers
+  function scroll(dir)  { document.getElementById('track').scrollBy({ left: dir * 640, behavior: 'smooth' }); }
+  function scroll2(dir) { document.querySelector('#track2').scrollBy({ left: dir * 640, behavior: 'smooth' }); }
+
+  // Tabs
+  document.getElementById('tabs').querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const cat = tab.dataset.tab;
+      const filtered = cat === 'all' ? products : products.filter(p => p.category === cat);
+      renderTrack('track', filtered.length ? filtered : products);
+    });
+  });
+
+  // Chips
+  document.getElementById('chips').querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+
+  // Wishlist toggle
+  function toggleWish(e, btn) {
+    e.stopPropagation();
+    btn.classList.toggle('active');
+  }
+
+  // Add to cart flash
+  function addToCart(card) {
+    const btn = card.querySelector('.add-to-cart');
+    btn.textContent = '✔ ADDED';
+    btn.style.background = '#388e3c';
+    btn.style.opacity = '1';
+    btn.style.transform = 'translateY(0)';
+    setTimeout(() => {
+      btn.textContent = 'ADD TO CART';
+      btn.style.background = '';
+      btn.style.opacity = '';
+    }, 1500);
+  }
+</script>
+</body>
+</html>
